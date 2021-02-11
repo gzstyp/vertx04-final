@@ -9,7 +9,7 @@
   <version>v1.0.0</version>
 
   <description>
-    vert.x应用完美的学习示例_final,前置请求处理 router.route().handler(context->{});
+    vert.x应用完美的学习示例_final,未做单一职责拆分结构,前置请求处理 router.route().handler(context->{});
   </description>
 
   <properties>

@@ -1,6 +1,5 @@
 package com.fwtai;
 
-import com.fwtai.service.DatabaseVerticle;
 import com.fwtai.service.UserVerticle;
 import com.fwtai.service.VertxEventBus;
 import com.fwtai.tool.ToolClient;
@@ -26,7 +25,7 @@ import io.vertx.ext.web.sstore.SessionStore;
 import org.flywaydb.core.api.FlywayException;
 
 /**
- * Vert.x 异步协调|异步处理|多语言编程实现
+ * Vert.x 异步协调|异步处理|多语言编程实现|未做拆分单一职责(拆分职责详情本项目目录下的 vertx05-final)
  * doConfig();
  *  compose(this::storeConfig);
  *  compose(this::doDatabaseMigrations);
@@ -52,13 +51,13 @@ public final class Launcher extends AbstractVerticle{
       //步骤2
       .compose(this::storeConfig)
       //步骤3
-      //.compose(this::doDatabaseMigrations)//todo 已抽取到 com.fwtai.service.DatabaseVerticle,并在方法 deployOtherVerticles()引用部署;
+      .compose(this::doDatabaseMigrations)//todo 已抽取到 com.fwtai.service.DatabaseVerticle,并在方法 deployOtherVerticles()引用部署;
       //步骤4
       .compose(this::configRouter)//todo 已抽取到 com.fwtai.service.WebVerticle,并在方法 deployOtherVerticles()引用部署;
       //步骤5
       .compose(this::startHttpServer)//todo 已抽取到 com.fwtai.service.WebVerticle,并在方法 deployOtherVerticles()引用部署;
       //步骤6,部署其他的
-      .compose(this::deployOtherVerticles)
+      .compose(this::deployOtherVerticles)//todo 未抽取到单一职责时
       //步骤7,启动
       .setHandler(start::handle);//最后调用的是本身的start()方法
 
@@ -71,7 +70,8 @@ public final class Launcher extends AbstractVerticle{
     final ConfigStoreOptions config = new ConfigStoreOptions().setType("file").setFormat("json").setConfig(new JsonObject().put("path","config.json"));//当然也可以再创建一个
     final ConfigRetrieverOptions opts = new ConfigRetrieverOptions().addStore(config);//当然可以根据上面再创建多个可以添加多个
     final ConfigRetriever cfgRetrieve = ConfigRetriever.create(vertx,opts);
-    return Future.future(cfgRetrieve::getConfig);//完整写法: return Future.<JsonObject> future(promise->cfgRetrieve.getConfig(promise));
+    //todo 下行不要简写 return Future.future(cfgRetrieve::getConfig);也不要删除 <JsonObject>
+    return Future.<JsonObject> future(promise->cfgRetrieve.getConfig(promise));
   }
 
   //步骤2,初始化配置,是否有报错???
@@ -83,7 +83,7 @@ public final class Launcher extends AbstractVerticle{
     //return Promise.<Void>succeededPromise().future();//todo 新版本会报错
   }
 
-  //步骤3,配置数据库,todo 已抽取到 com.fwtai.service.DatabaseVerticle,并在方法 deployOtherVerticles()引用部署;
+  //步骤3,配置数据库迁移或更改数据库表,todo 已抽取到 com.fwtai.service.DatabaseVerticle,并在方法 deployOtherVerticles()引用部署;
   protected Future<Void> doDatabaseMigrations(final Void unused){
     final JsonObject jsonObject = loadedConfig.getJsonObject("db");
     final String url = jsonObject.getString("url","jdbc:mysql://192.168.3.66:3306/security_backend?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true");
@@ -106,7 +106,7 @@ public final class Launcher extends AbstractVerticle{
     }
   }
 
-  //步骤4,todo 已抽取到 com.fwtai.service.WebVerticle,并在方法 deployOtherVerticles()引用部署;
+  //步骤4,路由配置,todo 已抽取到 com.fwtai.service.WebVerticle,并在方法 deployOtherVerticles()引用部署;
   protected Future<Router> configRouter(final Void unused){
     final Router router = Router.router(vertx);
     final SessionStore session1 = LocalSessionStore.create(vertx);//ok,当然也可以使用下面的方式创建!!!
@@ -126,7 +126,7 @@ public final class Launcher extends AbstractVerticle{
     final JsonObject http = loadedConfig.getJsonObject("http");// {"port":803}
     final Integer httpPort = http.getInteger("port",801);
     final HttpServer server = vertx.createHttpServer().requestHandler(router);
-    return Future.future(promise -> server.listen(httpPort,promise));// 完整写法: return Future.<HttpServer>future(promise -> server.listen(httpPort,promise));
+    return Future.<HttpServer>future(promise -> server.listen(httpPort,promise));
   }
 
   //步骤6
@@ -134,13 +134,12 @@ public final class Launcher extends AbstractVerticle{
     final DeploymentOptions opts = new DeploymentOptions().setConfig(loadedConfig);//传入配置文件???
     vertx.deployVerticle(new UserVerticle());
     vertx.deployVerticle(new VertxEventBus());
-    final Future<String> dbConfig = Future.future((promise) -> vertx.deployVerticle(new DatabaseVerticle(),opts,promise));
     final Future<String> helloGroovy = Future.future(promise -> vertx.deployVerticle("Hello.groovy",opts,promise));
     final Future<String> helloJavascript = Future.future(promise -> vertx.deployVerticle("Hello.js",opts,promise));
 
     final Future<String> apiGroovy = Future.future(promise -> vertx.deployVerticle("Api.groovy",promise));
     final Future<String> apiJavascript = Future.future(promise -> vertx.deployVerticle("Api.js",promise));
-    return CompositeFuture.all(helloGroovy,helloJavascript,apiGroovy,apiJavascript,dbConfig).mapEmpty();
+    return CompositeFuture.all(helloGroovy,helloJavascript,apiGroovy,apiJavascript).mapEmpty();//.mapEmpty() 终止符
   }
 
   //方法的参数类型,blockingHandler(Handler<RoutingContext> requestHandler)
