@@ -22,6 +22,7 @@ import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.sstore.ClusteredSessionStore;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 import io.vertx.ext.web.sstore.SessionStore;
+import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 
 /**
@@ -86,10 +87,19 @@ public final class Launcher extends AbstractVerticle{
   //步骤3,配置数据库迁移或更改数据库表,todo 已抽取到 com.fwtai.service.DatabaseVerticle,并在方法 deployOtherVerticles()引用部署;
   protected Future<Void> doDatabaseMigrations(final Void unused){
     final JsonObject jsonObject = loadedConfig.getJsonObject("db");
-    final String url = jsonObject.getString("url","jdbc:mysql://192.168.3.66:3306/security_backend?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true");
+    /*final String url = jsonObject.getString("url","jdbc:mysql://192.168.3.66:3306/security_backend?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true");
     final String user = jsonObject.getString("userName","root");
     final String password = jsonObject.getString("password","rootFwtai");
-    /*final Flyway flyway = Flyway.configure().dataSource(url,user,password).load();
+    try {
+      return Promise.<Void> succeededPromise().future();//ok,todo 新版本会报错
+    } catch (final FlywayException fe) {
+      fe.printStackTrace();
+      return Promise.<Void> failedPromise(fe).future();//ok,todo 新版本会报错
+    }*/
+    final String url = jsonObject.getString("url","jdbc:mysql://192.168.3.66:3306/vertx04-final?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true");
+    final String user = jsonObject.getString("userName","root");
+    final String password = jsonObject.getString("password","rootFwtai");
+    final Flyway flyway = Flyway.configure().dataSource(url,user,password).load();
     final Promise<Void> promise = Promise.promise();
     try {
       flyway.migrate();
@@ -97,13 +107,7 @@ public final class Launcher extends AbstractVerticle{
     } catch (final FlywayException fe) {
       promise.fail(fe);
     }
-    return promise.future();*/
-    try {
-      return Promise.<Void> succeededPromise().future();//todo 新版本会报错
-    } catch (final FlywayException fe) {
-      fe.printStackTrace();
-      return Promise.<Void> failedPromise(fe).future();//todo 新版本会报错
-    }
+    return promise.future();
   }
 
   //步骤4,路由配置,todo 已抽取到 com.fwtai.service.WebVerticle,并在方法 deployOtherVerticles()引用部署;
