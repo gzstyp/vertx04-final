@@ -133,7 +133,7 @@ public final class Launcher extends AbstractVerticle{
     return Future.<HttpServer>future(promise -> server.listen(httpPort,promise));
   }
 
-  //步骤6
+  //步骤6 todo 注意和本项目的目录下的vertx05-final项目参数对比
   protected Future<Void> deployOtherVerticles(final HttpServer server){
     final DeploymentOptions opts = new DeploymentOptions().setConfig(loadedConfig);//传入配置文件???
     vertx.deployVerticle(new UserVerticle());
