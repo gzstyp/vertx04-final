@@ -136,8 +136,8 @@ public final class Launcher extends AbstractVerticle{
   //步骤6 todo 注意和本项目的目录下的vertx05-final项目参数对比
   protected Future<Void> deployOtherVerticles(final HttpServer server){
     final DeploymentOptions opts = new DeploymentOptions().setConfig(loadedConfig);//传入配置文件???
+    vertx.deployVerticle(new VertxEventBus());//注释后调用会报错 http://127.0.0.1:803/api/v1.0/eventBus/fwtai
     vertx.deployVerticle(new UserVerticle());
-    vertx.deployVerticle(new VertxEventBus());
     final Future<String> helloGroovy = Future.future(promise -> vertx.deployVerticle("Hello.groovy",opts,promise));
     final Future<String> helloJavascript = Future.future(promise -> vertx.deployVerticle("Hello.js",opts,promise));
 
