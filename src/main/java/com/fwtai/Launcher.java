@@ -1,8 +1,8 @@
 package com.fwtai;
 
-import com.fwtai.example.DatabaseVerticle;
-import com.fwtai.example.UserVerticle;
-import com.fwtai.example.VertxEventBus;
+import com.fwtai.service.DatabaseVerticle;
+import com.fwtai.service.UserVerticle;
+import com.fwtai.service.VertxEventBus;
 import com.fwtai.tool.ToolClient;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;

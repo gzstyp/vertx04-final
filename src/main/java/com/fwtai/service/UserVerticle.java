@@ -1,4 +1,4 @@
-package com.fwtai.example;
+package com.fwtai.service;
 
 import com.fwtai.tool.ToolClient;
 import io.vertx.core.AbstractVerticle;

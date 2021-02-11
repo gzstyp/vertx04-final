@@ -1,6 +1,6 @@
 package com.fwtai;
 
-import com.fwtai.example.UserVerticle;
+import com.fwtai.service.UserVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;

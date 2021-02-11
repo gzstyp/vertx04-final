@@ -1,4 +1,4 @@
-package com.fwtai.example;
+package com.fwtai.service;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
