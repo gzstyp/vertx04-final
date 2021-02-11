@@ -154,8 +154,8 @@ public final class Launcher extends AbstractVerticle{
   //方法的参数类型,blockingHandler(Handler<RoutingContext> requestHandler)
   protected void eventBus(final RoutingContext context){
     final String name = context.pathParam("name");
-    vertx.eventBus().request("hello.named.addr",name,reply->{
-      ToolClient.getResponse(context).end("EventBus,"+reply.result().body());
+    vertx.eventBus().request("hello.named.addr",name,msg->{
+      ToolClient.getResponse(context).end("EventBus,"+msg.result().body());
     });
   }
 }
