@@ -16,7 +16,7 @@ import org.flywaydb.core.api.FlywayException;
  * @Email service@yinlz.com
  * @官网 <url>http://www.yinlz.com</url>
 */
-public final class DatabaseVerticle extends AbstractVerticle {
+public final class WebVerticle extends AbstractVerticle {
 
   @Override
   public void start(final Promise<Void> start) throws Exception {

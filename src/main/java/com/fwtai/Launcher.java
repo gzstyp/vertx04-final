@@ -52,11 +52,11 @@ public final class Launcher extends AbstractVerticle{
       //步骤2
       .compose(this::storeConfig)
       //步骤3
-      //.compose(this::doDatabaseMigrations)//todo 已抽取到 com.fwtai.example.DatabaseVerticle,并在方法 deployOtherVerticles()引用部署;
+      //.compose(this::doDatabaseMigrations)//todo 已抽取到 com.fwtai.service.DatabaseVerticle,并在方法 deployOtherVerticles()引用部署;
       //步骤4
-      .compose(this::configRouter)
+      .compose(this::configRouter)//todo 已抽取到 com.fwtai.service.WebVerticle,并在方法 deployOtherVerticles()引用部署;
       //步骤5
-      .compose(this::startHttpServer)
+      .compose(this::startHttpServer)//todo 已抽取到 com.fwtai.service.WebVerticle,并在方法 deployOtherVerticles()引用部署;
       //步骤6,部署其他的
       .compose(this::deployOtherVerticles)
       //步骤7,启动
@@ -77,10 +77,13 @@ public final class Launcher extends AbstractVerticle{
   //步骤2,初始化配置,是否有报错???
   protected Future<Void> storeConfig(final JsonObject config){
     loadedConfig.mergeIn(config);
-    return Promise.<Void>succeededPromise().future();//todo 新版本会报错
+    final Promise<Void> promise = Promise.promise();
+    promise.complete();
+    return promise.future();
+    //return Promise.<Void>succeededPromise().future();//todo 新版本会报错
   }
 
-  //步骤3,配置数据库,todo 已抽取到 com.fwtai.example.DatabaseVerticle,并在方法 deployOtherVerticles()引用部署;
+  //步骤3,配置数据库,todo 已抽取到 com.fwtai.service.DatabaseVerticle,并在方法 deployOtherVerticles()引用部署;
   protected Future<Void> doDatabaseMigrations(final Void unused){
     final JsonObject jsonObject = loadedConfig.getJsonObject("db");
     final String url = jsonObject.getString("url","jdbc:mysql://192.168.3.66:3306/security_backend?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true");
@@ -103,7 +106,7 @@ public final class Launcher extends AbstractVerticle{
     }
   }
 
-  //步骤4
+  //步骤4,todo 已抽取到 com.fwtai.service.WebVerticle,并在方法 deployOtherVerticles()引用部署;
   protected Future<Router> configRouter(final Void unused){
     final Router router = Router.router(vertx);
     final SessionStore session1 = LocalSessionStore.create(vertx);//ok,当然也可以使用下面的方式创建!!!
@@ -118,17 +121,17 @@ public final class Launcher extends AbstractVerticle{
     return Promise.succeededPromise(router).future();//todo 新版本会报错
   }
 
-  //步骤5,有参数,怎么传递?是否报错???
+  //步骤5,有参数,todo 已抽取到 com.fwtai.service.WebVerticle,并在方法 deployOtherVerticles()引用部署;
   protected Future<HttpServer> startHttpServer(final Router router){
     final JsonObject http = loadedConfig.getJsonObject("http");// {"port":803}
     final Integer httpPort = http.getInteger("port",801);
     final HttpServer server = vertx.createHttpServer().requestHandler(router);
-    return Future.<HttpServer>future(promise -> server.listen(httpPort,promise));
+    return Future.future(promise -> server.listen(httpPort,promise));// 完整写法: return Future.<HttpServer>future(promise -> server.listen(httpPort,promise));
   }
 
   //步骤6
   protected Future<Void> deployOtherVerticles(final HttpServer server){
-    final DeploymentOptions opts = new DeploymentOptions().setConfig(loadedConfig);
+    final DeploymentOptions opts = new DeploymentOptions().setConfig(loadedConfig);//传入配置文件???
     vertx.deployVerticle(new UserVerticle());
     vertx.deployVerticle(new VertxEventBus());
     final Future<String> dbConfig = Future.future((promise) -> vertx.deployVerticle(new DatabaseVerticle(),opts,promise));
@@ -153,3 +156,38 @@ public final class Launcher extends AbstractVerticle{
     });
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
