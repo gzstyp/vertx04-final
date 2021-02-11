@@ -25,7 +25,7 @@ import io.vertx.ext.web.sstore.SessionStore;
 import org.flywaydb.core.api.FlywayException;
 
 /**
- * Vert.x 异步协调|异步处理|多语言编程实现|未做拆分单一职责(拆分职责详情本项目目录下的 vertx05-final)
+ * Vert.x 异步协调|异步处理|多语言编程实现|未做拆分单一职责(已拆分职责详情本项目目录下的 vertx05-final)
  * doConfig();
  *  compose(this::storeConfig);
  *  compose(this::doDatabaseMigrations);
