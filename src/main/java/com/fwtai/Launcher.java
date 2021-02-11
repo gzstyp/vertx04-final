@@ -50,7 +50,7 @@ public final class Launcher extends AbstractVerticle{
     //步骤1
     doConfig()
       //步骤2
-      .compose(this::storeConfig)
+      .compose(this::storeConfig)//若有参数才编写方法时写入方法,若没有参数时直接写 final Void unused 参数
       //步骤3
       .compose(this::doDatabaseMigrations)//todo 已抽取到 com.fwtai.service.DatabaseVerticle,并在方法 deployOtherVerticles()引用部署;
       //步骤4
