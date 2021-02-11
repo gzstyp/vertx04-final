@@ -10,6 +10,7 @@
 
   <description>
     vert.x应用完美的学习示例_final,未做单一职责拆分结构,前置请求处理 router.route().handler(context->{});
+    未拆分单一职责(已拆分职责详情本项目目录下的 vertx05-final)
   </description>
 
   <properties>
